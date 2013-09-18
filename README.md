@@ -1,15 +1,29 @@
 CyberDuck-vQmods
 ================
-This is a collection of [vQmods](http://code.google.com/p/vqmod/) for [Opencart](https://github.com/opencart/opencart) that we have developed.
+This is a collection of [vQmods](http://code.google.com/p/vqmod/) for [Opencart](https://github.com/opencart/opencart) that we have developed. They have all been tested on Opencart Version 1.5.5.1
+
+You need to [install vQmod](http://code.google.com/p/vqmod/wiki/Install_OpenCart) on your Opencart installation and then drop these files into your xml folder. Some modifications may require editing your template files.
 
 TwitterCard
 ----------------
-Add [twitter card](https://dev.twitter.com/docs/cards/types/product-card) meta information to your products.
+Add [Twitter Card](https://dev.twitter.com/docs/cards/types/product-card) meta information to your products.
 You will need to ouput the meta data to your header.tpl 
 ```php
 <?php
 if (isset($twittercards)): foreach ($twittercards as $twittercard):
 echo '<meta property="' . $twittercard['property'] . '" content="' . $twittercard['content'] . '" />';
+endforeach; endif;
+?>
+```
+
+OpenGraph
+----------------
+Add Facebook [Opengraph](https://developers.facebook.com/docs/web/tutorials/scrumptious/open-graph-object/) meta information to your products.
+You will need to ouput the meta data to your header.tpl 
+```php
+<?php
+if (isset($opengraphs)): foreach ($opengraphs as $opengraph):
+echo '<meta property="' . $opengraph['property'] . '" content="' . $opengraph['content'] . '" />';
 endforeach; endif;
 ?>
 ```
