@@ -1,0 +1,64 @@
+<modification>
+        <id>Add twitter card data to product pages</id>
+        <version>1.0</version>
+        <vqmver>2.0</vqmver>
+        <author>Ben Speakman</author>
+        <file name="catalog/controller/product/product.php">
+                <operation>
+                        <search position="before"><![CDATA[
+                        $this->model_catalog_product->updateViewed($this->request->get['product_id']);
+                        ]]></search>
+                        <add><![CDATA[
+                        $title = (empty($product_info['meta_title'])) ? $product_info['name'] : $product_info['meta_title'];
+                        $this->document->addCardData('twitter:card', 'product');
+                        $this->document->addCardData('twitter:site', '@Cyberduck_uk');
+                        $this->document->addCardData('twitter:title', $title);
+                        $this->document->addCardData('twitter:data1', 'Price');
+                        $this->document->addCardData('twitter:label1', $this->data['price']);
+                        $this->document->addCardData('twitter:data2', 'Manufacturer');
+                        $this->document->addCardData('twitter:label2', $this->data['manufacturer']);
+                        $this->document->addCardData('twitter:description', $this->document->getDescription());
+                        ]]></add>
+                </operation>
+                <operation>
+                        <search position="after" offset="1"><![CDATA[
+                        'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('config_image_additional_width'), $this->config->get('config_image_additional_height'))
+                        ]]></search>
+                        <add><![CDATA[
+                        $this->document->addCardData('twitter:image:width', $this->config->get('config_image_popup_width'));
+                        $this->document->addCardData('twitter:image:height', $this->config->get('config_image_popup_height'));
+                        $this->document->addCardData('twitter:image', str_replace(" ", "%20", $this->model_tool_image->resize($result['image'], $this->config->get('config_image_popup_width'), $this->config->get('config_image_popup_height'))));
+                        ]]></add>
+                </operation>
+        </file>
+        <file name="system/library/document.php">
+                <operation>
+                        <search position="before"><![CDATA[
+                        public function setTitle($title) {
+                        ]]></search>
+                        <add><![CDATA[
+                        private $twittercard = array();
+                        public function addCardData($property, $content) {
+                                $this->twittercard[md5($property.$content)] = array(
+                                        'property' => $property,
+                                        'content'  => $content
+                                );      
+                        }
+                        
+                        public function getCardData() {
+                                return $this->twittercard;
+                        }
+                        ]]></add>
+                </operation>
+        </file>
+        <file name="catalog/controller/common/header.php">
+                <operation>
+                        <search position="before"><![CDATA[
+                        $this->data['description'] = $this->document->getDescription();
+                        ]]></search>
+                        <add><![CDATA[
+                        $this->data['twittercards'] = $this->document->getCardData();
+                        ]]></add>
+                </operation>
+        </file>
+</modification>

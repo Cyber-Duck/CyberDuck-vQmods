@@ -1,0 +1,44 @@
+<modification>
+        <id>Track transaction with google</id>
+        <version>1.0</version>
+        <vqmver>2.0</vqmver>
+        <author>Ben Speakman</author>
+        <file name="catalog/controller/checkout/success.php">
+                <operation>
+                        <search position="before"><![CDATA[
+                        if (isset($this->session->data['order_id'])) {
+                        ]]></search>
+                        <add><![CDATA[
+                        $this->load->model('account/order');
+
+                        $order_totals   = $this->model_account_order->getOrderTotals($this->session->data['order_id']);
+                        $order_info     = $this->model_account_order->getOrder($this->session->data['order_id']);
+                        $order_products = $this->model_account_order->getOrderProducts($this->session->data['order_id']);
+
+                        $this->data['transaction'] = array(
+
+                                'id'       => $this->session->data['order_id'], 
+                                'city'     => $order_info['payment_city'],
+                                'state'    => $order_info['payment_zone'],
+                                'country'  => $order_info['payment_iso_code_2'],
+                                'products' => $order_products
+
+                        );
+                        
+                        foreach ($order_totals as $total) {
+                                switch ($total['code']) {
+                                        case 'shipping':
+                                                $this->data['transaction']['shipping'] = $total['value'];
+                                                break;
+                                        case 'tax':
+                                                $this->data['transaction']['tax'] = $total['value'];
+                                                break;
+                                        case 'total':
+                                                $this->data['transaction']['total'] = $total['value'];
+                                                break;
+                                }
+                        }
+                        ]]></add>
+                </operation>
+        </file>
+</modification>
